@@ -11,8 +11,22 @@ echo [1/4] Terminating existing services to clear ports...
 taskkill /F /IM nginx.exe >nul 2>&1
 taskkill /F /IM node.exe >nul 2>&1
 taskkill /F /IM python.exe >nul 2>&1
+net stop w3svc /y >nul 2>&1
 echo - NGINX, Node.js, and Python processes terminated.
+echo - Windows Web Services (IIS) stopped to free Port 80.
 timeout /t 2 /nobreak >nul
+
+:: 1.1 Validate NGINX Configuration
+echo [1.1] Validating NGINX syntax...
+cd /d "C:\Users\Administrator\Documents\VPN MANAGEMENT SYSTEM\nginx-1.28.1"
+nginx.exe -t
+if errorlevel 1 (
+    echo [ERROR] NGINX Configuration is invalid. Check the config file for errors.
+    pause
+    exit /b 1
+)
+cd ..
+echo - NGINX configuration is valid.
 
 :: 2. Launch VPN Management Backend
 echo.
@@ -46,10 +60,10 @@ echo        ALL SYSTEMS SUCCESSFULLY INITIALIZED!
 echo ==========================================================
 echo.
 echo   [VPN PORTAL]
-echo   URL: https://localhost:444
+echo   URL: https://[SERVER_IP_OR_URL]:444
 echo.
 echo   [LICENSING HUB]
-echo   URL: http://DCPLCMGRWEB01.secedu.qa (Port 80/443)
+echo   URL: https://DCPLCMGRWEB01.secedu.qa
 echo.
 echo ==========================================================
 echo NOTE: Keep the minimized backend windows open for services.
